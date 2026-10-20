@@ -43,8 +43,14 @@ def run_agent(goal, budget, verbose=True):
         messages.append(msg)
 
         if not msg.tool_calls:
+            used = {name for name, args in calls}
+            if "build_plan" not in used or "evaluate_plan" not in used:
+                messages.append({"role": "user", "content":
+                                 "You must call build_plan and then evaluate_plan before "
+                                 "giving the FINAL PLAN. Follow the steps."})
+                continue
             return msg.content, calls
-
+        
         for call in msg.tool_calls:
             name = call.function.name
             args = call.function.arguments

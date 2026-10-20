@@ -56,3 +56,31 @@ def make_perfect_planner(options, budget):
         return leo["option"] if leo else None
 
     return policy
+
+def top_gain_minutes(options, n):
+    gains = []
+    for t, opts in options.items():
+        haps = next(o for o in opts if o["option"] == "HAPS")
+        leo = best_leo(opts)
+        leo_cap = usable_capacity(leo) if leo else 0.0
+        gain = usable_capacity(haps) - leo_cap
+        if gain > 0:
+            gains.append((gain, t))
+    gains.sort(reverse=True)
+    return {t for gain, t in gains[:max(0, n)]}
+
+
+def make_hybrid_planner(forecast_options, budget, reserve):
+    haps_minutes = top_gain_minutes(forecast_options, budget - reserve)
+
+    def policy(t, opts, current, haps_left):
+        if t in haps_minutes:
+            return "HAPS"
+        leo = best_leo(opts)
+        if leo is not None and leo["snr_db"] >= MIN_SNR_DB:
+            return leo["option"]
+        if haps_left > 0:
+            return "HAPS"
+        return leo["option"] if leo else None
+
+    return policy

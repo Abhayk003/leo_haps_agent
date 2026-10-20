@@ -41,7 +41,15 @@ for i, (goal, expected) in enumerate(GOALS, start=1):
     print(f"Goal {i}: {goal}")
     print(f"  Expected settings: {expected}")
     print(f"  Chosen settings:   {chosen}   {'CORRECT' if ok else 'WRONG'}")
+    print(f"  LIMITATION line written: {'yes' if 'LIMITATION:' in answer else 'no'}")
+    for line in answer.splitlines():
+        if "LIMITATION:" in line:
+            print(f"    -> {line.strip()}")
+    if not ok:
+        print("  Full answer (settings were wrong):")
+        print(answer)
 
+        
     plan = extract_plan(answer)
     if plan is None:
         print("  Verified result:   invalid answer (no single FINAL PLAN line)")

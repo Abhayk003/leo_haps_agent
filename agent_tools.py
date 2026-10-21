@@ -11,13 +11,20 @@ def set_reserve(n):
     global RESERVE
     RESERVE = max(0, int(n))
 
+
 def set_planning_data(path, note=""):
     global OPTIONS, DATA_NOTE
     OPTIONS = load_options(path)
     DATA_NOTE = note
 
 
+def set_true_data(path):
+    global TRUE_OPTIONS
+    TRUE_OPTIONS = load_options(path)
+
+
 BUDGET = 15
+
 
 def to_ranges(minutes):
     if not minutes:
@@ -54,7 +61,7 @@ def get_scenario_summary() -> str:
     minutes = sorted(OPTIONS)
     leo_dead = [t for t in minutes if haps_gain(t)[1] == 0.0]
     rain = [t for t in minutes if OPTIONS[t][0]["raining"]]
-    haps_better = [t for t in minutes if haps_gain(t)[0] > 0]  
+    haps_better = [t for t in minutes if haps_gain(t)[0] > 0]
     lines = [
         f"Scenario length: {len(minutes)} minutes (minute {minutes[0]} to {minutes[-1]}).",
         f"Minutes with no usable LEO link (outage unless HAPS is used): "
@@ -123,7 +130,6 @@ def evaluate_plan(haps_minutes: str) -> str:
     if DATA_NOTE:
         text = DATA_NOTE + "\n" + text
     return text
-
 
 
 def build_plan(max_haps_minutes: int, min_gain_mbps: float, minimise_haps_use: bool) -> str:
